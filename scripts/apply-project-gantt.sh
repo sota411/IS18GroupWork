@@ -18,26 +18,26 @@ if ! gh auth status >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! gh project view "\${PROJECT_NUMBER}" --owner "\${OWNER}" >/dev/null 2>&1; then
-  echo "ERROR: Project #\${PROJECT_NUMBER} を操作できません。"
+if ! gh project view "${PROJECT_NUMBER}" --owner "${OWNER}" >/dev/null 2>&1; then
+  echo "ERROR: Project #${PROJECT_NUMBER} を操作できません。"
   echo
   echo "Projects の権限が足りない場合は、先に次を実行してください:"
   echo "  gh auth refresh -s project"
   exit 1
 fi
 
-echo "==> Project #\${PROJECT_NUMBER} をリポジトリにリンク"
-gh project link "\${PROJECT_NUMBER}" --owner "\${OWNER}" --repo "\${REPO}" >/dev/null 2>&1 || true
+echo "==> Project #${PROJECT_NUMBER} をリポジトリにリンク"
+gh project link "${PROJECT_NUMBER}" --owner "${OWNER}" --repo "${REPO}" >/dev/null 2>&1 || true
 
 ensure_date_field() {
   local field_name="$1"
-  if gh project field-list "\${PROJECT_NUMBER}" --owner "\${OWNER}" --format json --jq '.fields[].name' | grep -Fxq "\${field_name}"; then
-    echo "==> \${field_name}: 既存"
+  if gh project field-list "${PROJECT_NUMBER}" --owner "${OWNER}" --format json --jq '.fields[].name' | grep -Fxq "${field_name}"; then
+    echo "==> ${field_name}: 既存"
   else
-    echo "==> \${field_name}: 作成"
-    gh project field-create "\${PROJECT_NUMBER}" \
-      --owner "\${OWNER}" \
-      --name "\${field_name}" \
+    echo "==> ${field_name}: 作成"
+    gh project field-create "${PROJECT_NUMBER}" \
+      --owner "${OWNER}" \
+      --name "${field_name}" \
       --data-type DATE >/dev/null
   fi
 }
@@ -72,40 +72,40 @@ EOF
 echo "==> Issue #1〜#20 を Project に追加して日付を設定"
 
 while IFS='|' read -r issue start target; do
-  [[ -z "\${issue}" ]] && continue
+  [[ -z "${issue}" ]] && continue
 
-  url="https://github.com/\${REPO}/issues/\${issue}"
-  printf "  #%s  %s -> %s ... " "\${issue}" "\${start}" "\${target}"
+  url="https://github.com/${REPO}/issues/${issue}"
+  printf "  #%s  %s -> %s ... " "${issue}" "${start}" "${target}"
 
-  gh project item-add "\${PROJECT_NUMBER}" \
-    --owner "\${OWNER}" \
-    --url "\${url}" >/dev/null 2>&1 || true
+  gh project item-add "${PROJECT_NUMBER}" \
+    --owner "${OWNER}" \
+    --url "${url}" >/dev/null 2>&1 || true
 
-  gh project item-edit "\${PROJECT_NUMBER}" \
-    --owner "\${OWNER}" \
-    --url "\${url}" \
+  gh project item-edit "${PROJECT_NUMBER}" \
+    --owner "${OWNER}" \
+    --url "${url}" \
     --field "Start date" \
-    --date "\${start}" >/dev/null
+    --date "${start}" >/dev/null
 
-  gh project item-edit "\${PROJECT_NUMBER}" \
-    --owner "\${OWNER}" \
-    --url "\${url}" \
+  gh project item-edit "${PROJECT_NUMBER}" \
+    --owner "${OWNER}" \
+    --url "${url}" \
     --field "Target date" \
-    --date "\${target}" >/dev/null
+    --date "${target}" >/dev/null
 
   echo "OK"
-done <<< "\${TASKS}"
+done <<< "${TASKS}"
 
 echo
 echo "==> 設定結果"
-gh project item-list "\${PROJECT_NUMBER}" \
-  --owner "\${OWNER}" \
+gh project item-list "${PROJECT_NUMBER}" \
+  --owner "${OWNER}" \
   --limit 100 \
   --field "Start date" \
   --field "Target date"
 
 echo
-echo "完了: \${PROJECT_URL}"
+echo "完了: ${PROJECT_URL}"
 echo
-echo "GitHub で Project #\${PROJECT_NUMBER} を開き、View の Layout を Roadmap にしてください。"
+echo "GitHub で Project #${PROJECT_NUMBER} を開き、View の Layout を Roadmap にしてください。"
 echo "Roadmap の Date fields で Start date / Target date を選べば、バー表示されます。"
