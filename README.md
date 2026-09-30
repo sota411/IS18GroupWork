@@ -2,6 +2,10 @@
 
 IS18　1組授業のグループワーク用リポジトリ。
 
+## 企画書
+
+Gmailからの企業取り込みとJevによるマイページ登録フォームへの自動入力をコアとする企画は, [docs/proposal.md](docs/proposal.md) を参照。
+
 ## スケジュール
 
 9/30〜11/04 の詳細ガントチャートは [docs/gantt.md](docs/gantt.md) を参照。
